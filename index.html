@@ -27,32 +27,31 @@
         .btn-gris { background: #64748b; color: white; }
         .btn-rojo { background: var(--rojo); color: white; width: auto; padding: 5px 10px; font-size: 10px; }
         
-        /* MODAL */
+        /* MODAL INVENTARIO */
         #modal-inventario{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);display:none;z-index:3000;align-items:center;justify-content:center;}
-        .modal-content{background:#f1f5f9;width:96%;max-width:1150px;height:88vh;border-radius:20px;padding:24px 28px;overflow-y:auto;position:relative;}
-        .cerrar-modal{position:absolute;top:16px;right:20px;font-size:32px;cursor:pointer;color:var(--rojo);line-height:1;}
-        #grid-inventario{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-top:16px;}
-        .prod-card{background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,31,84,0.07);display:flex;flex-direction:column;border:1px solid #e2e8f0;transition:transform .15s,box-shadow .15s;}
-        .prod-card:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,31,84,0.14);}
-        .prod-img-wrap{width:100%;height:115px;background:#fff;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #f1f5f9;overflow:hidden;}
-        .prod-img-wrap img{max-height:105px;max-width:90%;object-fit:contain;}
-        .prod-img-placeholder{font-size:42px;}
-        .spinner{width:26px;height:26px;border:3px solid #e2e8f0;border-top-color:var(--azul);border-radius:50%;animation:spin .8s linear infinite;}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        .prod-info{padding:9px 10px 5px;flex:1;}
-        .prod-nombre{font-size:11px;font-weight:700;color:var(--azul);line-height:1.3;margin-bottom:3px;min-height:26px;}
-        .prod-cod{font-size:9px;color:#94a3b8;font-family:monospace;margin-bottom:7px;}
-        .precio-row{display:flex;align-items:center;gap:4px;}
-        .precio-row input{padding:5px 6px;border:1.5px solid #cbd5e1;border-radius:7px;width:60px;font-size:13px;font-weight:700;}
-        .precio-row input:focus{outline:none;border-color:var(--azul);}
-        .iva-badge{background:var(--azul);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;}
-        .card-footer{padding:6px 10px 9px;}
-        .btn-borrar{width:100%;padding:5px;font-size:10px;background:#fee2e2;color:#b91c1c;border:none;border-radius:7px;cursor:pointer;font-weight:700;}
-        .btn-borrar:hover{background:#fca5a5;}
-        .status-bar{display:flex;align-items:center;gap:10px;background:white;border-radius:10px;padding:8px 14px;margin-top:10px;border:1px solid #e2e8f0;}
-        .status-bar span{font-size:12px;color:#475569;white-space:nowrap;}
-        .prog-wrap{flex:1;height:7px;background:#e2e8f0;border-radius:10px;overflow:hidden;}
-        .prog-fill{height:100%;background:var(--verde);border-radius:10px;transition:width .4s;width:0%;}
+        .modal-content{background:#f1f5f9;width:96%;max-width:900px;height:92vh;border-radius:20px;padding:16px 18px;overflow-y:auto;position:relative;}
+        .cerrar-modal{position:absolute;top:14px;right:16px;font-size:32px;cursor:pointer;color:var(--rojo);line-height:1;}
+
+        /* Buscador */
+        #inv-buscar{width:100%;padding:10px 14px;border:1.5px solid #cbd5e1;border-radius:10px;font-size:15px;box-sizing:border-box;margin:10px 0 12px;}
+        #inv-buscar:focus{outline:none;border-color:var(--azul);}
+
+        /* Lista editable */
+        #lista-inventario{display:flex;flex-direction:column;gap:6px;}
+        .inv-fila{display:grid;grid-template-columns:1fr 80px 54px 36px;gap:6px;align-items:center;
+                  background:white;border-radius:10px;padding:8px 10px;border:1px solid #e2e8f0;}
+        .inv-fila:nth-child(even){background:#f8fafc;}
+        .inv-nom{font-size:13px;font-weight:700;color:var(--azul);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .inv-cod{font-size:10px;color:#94a3b8;font-family:monospace;}
+        .inv-pre{padding:5px 6px;border:1.5px solid #cbd5e1;border-radius:7px;width:100%;
+                 font-size:14px;font-weight:700;box-sizing:border-box;text-align:right;}
+        .inv-pre:focus{outline:none;border-color:var(--azul);}
+        .iva-badge{background:var(--azul);color:#fff;font-size:10px;font-weight:800;
+                   padding:3px 6px;border-radius:20px;text-align:center;}
+        .btn-borrar{background:#fee2e2;color:#b91c1c;border:none;border-radius:7px;
+                    cursor:pointer;font-weight:700;font-size:16px;padding:4px 8px;line-height:1;}
+        .btn-borrar:active{background:#fca5a5;}
+        .inv-contador{font-size:12px;color:#64748b;margin-bottom:6px;}
 
         #msg-centro { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(30, 41, 59, 0.95); color: white; padding: 20px 40px; border-radius: 15px; display: none; z-index: 4000; text-align: center; }
         #ticket-imprimible { display: none; }
@@ -105,7 +104,15 @@
 </head>
 <body onload="inicializar()">
 
-<div id="msg-centro"></div>
+<div id="msg-centro">
+    <div id="msg-texto"></div>
+    <button id="msg-excel-btn" onclick="descargarExcel(); ocultarToast()"
+        style="display:none; margin-top:12px; padding:8px 20px; background:#10b981;
+               color:white; border:none; border-radius:8px; font-weight:bold;
+               font-size:14px; cursor:pointer;">
+        📥 Descargar Excel
+    </button>
+</div>
 
 <!-- MODAL ESCÁNER CÁMARA -->
 <div id="modal-scanner">
@@ -118,13 +125,9 @@
     <div class="modal-content">
         <span class="cerrar-modal" onclick="cerrarInventario()">×</span>
         <h2 style="color:var(--azul);margin-top:0;margin-bottom:4px;">⚙️ GESTIÓN DE PRODUCTOS</h2>
-        <p style="margin:0;color:#64748b;font-size:13px;">Imágenes guardadas localmente. Solo se descargan una vez desde Open Food Facts.</p>
-        <div class="status-bar">
-            <span id="img-status-txt">—</span>
-            <div class="prog-wrap"><div class="prog-fill" id="img-prog"></div></div>
-            <button class="btn btn-azul" style="width:auto;padding:5px 12px;font-size:11px;margin:0;" onclick="recargarImagenes()">🔄 Recargar</button>
-        </div>
-        <div id="grid-inventario"></div>
+        <input type="search" id="inv-buscar" placeholder="🔍 Buscar por nombre o código..." oninput="filtrarInventario(this.value)">
+        <div class="inv-contador" id="inv-contador"></div>
+        <div id="lista-inventario"></div>
         <br>
         <button class="btn btn-azul" onclick="cerrarInventario()">✅ LISTO, VOLVER A VENTAS</button>
     </div>
@@ -165,10 +168,14 @@
         </div>
         <button class="btn btn-cobrar" onclick="cobrar()">✅ REGISTRAR COMPRA</button>
         <button class="btn btn-azul" onclick="handlePrint()">🖨️ IMPRIMIR TICKET</button>
-        <button class="btn btn-gris" onclick="verCaja()">📊 GASTO HOY</button>
+        <button class="btn btn-gris" id="btn-caja"
+                onclick="verCaja()"
+                oncontextmenu="descargarExcel(); return false;"
+                onpointerdown="iniciarLongPress()" onpointerup="cancelarLongPress()" onpointerleave="cancelarLongPress()">
+            📊 GASTO HOY
+        </button>
         <hr>
         <button class="btn btn-gris" style="background:#1e293b" onclick="abrirInventario()">⚙️ GESTIÓN INVENTARIO</button>
-        <button class="btn btn-gris" onclick="descargarExcel()">📥 EXCEL VENTAS</button>
     </div>
 </div>
 
@@ -220,148 +227,50 @@
 
     // ─── INVENTARIO CON IMÁGENES ───────────────────────────────────────────────
 
-    // Caché de imágenes en Base64 guardadas en localStorage
-    // Solo se descargan UNA VEZ; después arrancan al instante desde disco local
-    let imgCache = {};
-    try { imgCache = JSON.parse(localStorage.getItem('img_b64') || '{}'); } catch(e) {}
+    // imgCache eliminado — el inventario usa lista de texto, no imágenes
 
     function abrirInventario() {
         document.getElementById('modal-inventario').style.display = 'flex';
-        renderGrid();
-        cargarImagenesAuto();
+        document.getElementById('inv-buscar').value = '';
+        renderLista(inventarioOficial);
     }
     function cerrarInventario() {
         document.getElementById('modal-inventario').style.display = 'none';
         document.getElementById('p-cod').focus();
     }
-    function recargarImagenes() {
-        imgCache = {};
-        localStorage.removeItem('img_b64');
-        renderGrid();
-        cargarImagenesAuto();
+    function filtrarInventario(q) {
+        q = q.toLowerCase().trim();
+        const filtrado = q
+            ? inventarioOficial.filter(p => p.nom.toLowerCase().includes(q) || String(p.cod).includes(q))
+            : inventarioOficial;
+        renderLista(filtrado);
     }
+    // recargarImagenes eliminado (ya no se usan imágenes en lista)
 
-    // Construye las URLs candidatas de Open Food Facts para un EAN-13
-    function offUrls(cod) {
-        const s = String(cod).padStart(13,'0');
-        const p = `https://images.openfoodfacts.org/images/products/${s.slice(0,3)}/${s.slice(3,6)}/${s.slice(6,9)}/${s.slice(9)}`;
-        return [
-            p+'/front_es.400.jpg', p+'/front_es.200.jpg',
-            p+'/front.400.jpg',    p+'/front.200.jpg',
-            p+'/1.400.jpg',        p+'/1.200.jpg'
-        ];
-    }
+    // Renderiza la lista editable del inventario (filtrando por array recibido)
+    function renderLista(lista) {
+        const contenedor = document.getElementById('lista-inventario');
+        const contador   = document.getElementById('inv-contador');
+        contenedor.innerHTML = '';
+        contador.innerText   = lista.length + ' productos';
 
-    // Convierte una URL de imagen a base64 mediante un canvas (sin CORS restrictions en imágenes)
-    function urlToB64(url) {
-        return new Promise((resolve) => {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            img.onload = () => {
-                const MAX = 120;
-                let w = img.naturalWidth, h = img.naturalHeight;
-                if (w > h) { h = Math.round(h * MAX/w); w = MAX; }
-                else       { w = Math.round(w * MAX/h); h = MAX; }
-                const c = document.createElement('canvas');
-                c.width = w; c.height = h;
-                c.getContext('2d').drawImage(img, 0, 0, w, h);
-                try { resolve(c.toDataURL('image/webp', 0.75)); }
-                catch(e) { resolve(null); }
-            };
-            img.onerror = () => resolve(null);
-            img.src = url;
-        });
-    }
-
-    // Intenta cargar imagen desde las URLs candidatas, devuelve base64 o null
-    async function fetchImgB64(cod) {
-        for (const url of offUrls(cod)) {
-            const b64 = await urlToB64(url);
-            if (b64 && b64.length > 500) return b64;
-        }
-        return null;
-    }
-
-    // Renderiza la rejilla de tarjetas con lo que hay en caché
-    function renderGrid() {
-        const grid = document.getElementById('grid-inventario');
-        grid.innerHTML = '';
-        inventarioOficial.forEach((p, idx) => {
-            const cached = imgCache[p.cod];
-            let imgHtml;
-            if (cached === 'X') {
-                imgHtml = `<span class="prod-img-placeholder">🛒</span>`;
-            } else if (cached) {
-                imgHtml = `<img src="${cached}" alt="${p.nom}">`;
-            } else {
-                imgHtml = `<div class="spinner" id="sp-${idx}"></div>`;
-            }
-            grid.innerHTML += `
-            <div class="prod-card" id="card-${idx}">
-                <div class="prod-img-wrap" id="iw-${idx}">${imgHtml}</div>
-                <div class="prod-info">
-                    <div class="prod-nombre">${p.nom}</div>
-                    <div class="prod-cod">${p.cod||'—'}</div>
-                    <div class="precio-row">
-                        <input type="number" value="${p.pre.toFixed(2)}" step="0.01" min="0"
-                               onchange="modificarPrecio(${idx},this.value)">
-                        <span style="font-size:12px;color:#64748b">€</span>
-                        <span class="iva-badge">${p.iva}%</span>
-                    </div>
+        lista.forEach((p) => {
+            // Necesitamos el índice real en inventarioOficial para editar/borrar
+            const idxReal = inventarioOficial.indexOf(p);
+            const fila = document.createElement('div');
+            fila.className = 'inv-fila';
+            fila.innerHTML = `
+                <div>
+                    <div class="inv-nom" title="${p.nom}">${p.nom}</div>
+                    <div class="inv-cod">${p.cod || '—'}</div>
                 </div>
-                <div class="card-footer">
-                    <button class="btn-borrar" onclick="eliminarProducto(${idx})">🗑 Borrar</button>
-                </div>
-            </div>`;
+                <input class="inv-pre" type="number" value="${p.pre.toFixed(2)}"
+                       step="0.01" min="0"
+                       onchange="modificarPrecio(${idxReal}, this.value)">
+                <span class="iva-badge">${p.iva}%</span>
+                <button class="btn-borrar" onclick="eliminarProducto(${idxReal})">🗑</button>`;
+            contenedor.appendChild(fila);
         });
-    }
-
-    // Descarga y guarda en localStorage las imágenes que faltan
-    async function cargarImagenesAuto() {
-        const total = inventarioOficial.length;
-        const statusTxt = document.getElementById('img-status-txt');
-        const progBar   = document.getElementById('img-prog');
-
-        const pendientes = inventarioOficial.filter(p => p.cod && imgCache[p.cod] === undefined);
-
-        if (!pendientes.length) {
-            const n = Object.values(imgCache).filter(v=>v&&v!=='X').length;
-            if(statusTxt) statusTxt.innerText = `✅ ${n}/${total} con imagen guardada`;
-            if(progBar) progBar.style.width = '100%';
-            return;
-        }
-
-        let done = Object.keys(imgCache).length;
-
-        for (let idx = 0; idx < inventarioOficial.length; idx++) {
-            const p = inventarioOficial[idx];
-            if (!p.cod || imgCache[p.cod] !== undefined) {
-                done++;
-                continue;
-            }
-
-            const iw = document.getElementById(`iw-${idx}`);
-            const b64 = await fetchImgB64(p.cod);
-
-            imgCache[p.cod] = b64 || 'X';
-            if (iw) {
-                iw.innerHTML = b64
-                    ? `<img src="${b64}" alt="${p.nom}">`
-                    : `<span class="prod-img-placeholder">🛒</span>`;
-            }
-
-            done++;
-            const pct = Math.round(done/total*100);
-            if(statusTxt) statusTxt.innerText = `🔍 Descargando... ${done}/${total}`;
-            if(progBar) progBar.style.width = pct+'%';
-        }
-
-        // Guardar todo en localStorage — quedan incrustadas para siempre
-        try { localStorage.setItem('img_b64', JSON.stringify(imgCache)); } catch(e) {}
-
-        const n = Object.values(imgCache).filter(v=>v&&v!=='X').length;
-        if(statusTxt) statusTxt.innerText = `✅ ${n}/${total} imágenes guardadas permanentemente`;
-        if(progBar) progBar.style.width = '100%';
     }
 
     function actualizarTablaInventario() { /* retrocompatibilidad */ }
@@ -370,7 +279,8 @@
         if(confirm("¿Borrar este producto?")) {
             inventarioOficial.splice(idx,1);
             guardar();
-            renderGrid();
+            const q = document.getElementById('inv-buscar').value;
+            filtrarInventario(q);
             toast("🗑 PRODUCTO BORRADO");
         }
     }
@@ -385,9 +295,35 @@
         localStorage.setItem('prod_nuevos', JSON.stringify(mod));
     }
 
-    function toast(m) { 
-        const e = document.getElementById('msg-centro'); e.innerText = m; e.style.display = 'block'; 
-        setTimeout(() => e.style.display = 'none', 1500); 
+    let _toastTimer = null;
+    function toast(m, conExcel = false) {
+        if (_toastTimer) clearTimeout(_toastTimer);
+        const e   = document.getElementById('msg-centro');
+        const txt = document.getElementById('msg-texto');
+        const btn = document.getElementById('msg-excel-btn');
+        txt.innerText = m;
+        btn.style.display = conExcel ? 'inline-block' : 'none';
+        e.style.display = 'block';
+        // Si hay botón Excel, dar más tiempo para pulsar; si no, cerrar automático
+        _toastTimer = setTimeout(() => ocultarToast(), conExcel ? 6000 : 1800);
+    }
+    function ocultarToast() {
+        document.getElementById('msg-centro').style.display = 'none';
+        document.getElementById('msg-excel-btn').style.display = 'none';
+        if (_toastTimer) { clearTimeout(_toastTimer); _toastTimer = null; }
+    }
+
+    // Long press (600ms) en el botón GASTO HOY → descarga Excel
+    let _lpTimer = null;
+    function iniciarLongPress() {
+        _lpTimer = setTimeout(() => {
+            _lpTimer = null;
+            if (navigator.vibrate) navigator.vibrate([60, 40, 60]);
+            descargarExcel();
+        }, 600);
+    }
+    function cancelarLongPress() {
+        if (_lpTimer) { clearTimeout(_lpTimer); _lpTimer = null; }
     }
 
     function buscar(e) {
@@ -483,8 +419,12 @@
 
     function verCaja() {
         let v = JSON.parse(localStorage.getItem('v_casa')) || [];
-        let t = v.reduce((a,b) => b.fecha.includes(new Date().toLocaleDateString()) ? a + b.total : a, 0);
-        toast("💰 HOY: " + t.toFixed(2).replace('.', ',') + "€");
+        let hoy = new Date().toLocaleDateString();
+        let ventasHoy = v.filter(b => b.fecha.includes(hoy));
+        let t = ventasHoy.reduce((a, b) => a + b.total, 0);
+        let msg = "💰 HOY: " + t.toFixed(2).replace('.', ',') + "€  (" + ventasHoy.length + " ventas)";
+        // Mostrar con botón de Excel integrado
+        toast(msg, true);
     }
 
     // ── ESCÁNER DE CÁMARA (html5-qrcode) ──────────────────────────────────────
