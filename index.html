@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>CASA TUDELA v4.25 - ROBERTO GARCÍA SANZ</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        :root { --azul: #001f54; --verde: #10b981; --fondo: #f1f5f9; --rojo: #ef4444; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--fondo); margin: 0; padding: 20px; color: #1e293b; overflow-x: hidden; }
+        header { background: var(--azul); color: white; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logo-pantalla { font-size: 60px; vertical-align: middle; margin-right: 15px; }
+        .container { max-width: 1200px; margin: auto; display: grid; grid-template-columns: 1fr 350px; gap: 20px; }
+        .panel { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .entrada-datos { background: #cbd5e1; padding: 20px; border-radius: 15px; margin-bottom: 25px; display: grid; grid-template-columns: 1fr 2fr 80px 100px auto; gap: 10px; align-items: flex-end; }
+        label { font-size: 11px; font-weight: 800; color: var(--azul); margin-bottom: 5px; display: block; }
+        input, select { padding: 10px; border: 1px solid #94a3b8; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        table { width: 100%; border-collapse: collapse; }
+        th { border-bottom: 2px solid var(--azul); padding: 10px; text-align: left; color: var(--azul); }
+        td { padding: 10px; border-bottom: 1px solid #e2e8f0; }
+        .total-box { background: #1e293b; color: white; padding: 20px; border-radius: 20px; text-align: center; border: 2px solid var(--verde); margin-bottom: 15px; }
+        .monto { font-size: 40px; font-weight: 900; color: var(--verde); display: block; }
+        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 13px; margin-bottom: 8px; transition: 0.3s; }
+        .btn-cobrar { background: var(--verde); color: white; font-size: 16px; }
+        .btn-azul { background: #3b82f6; color: white; }
+        .btn-gris { background: #64748b; color: white; }
+        .btn-rojo { background: var(--rojo); color: white; width: auto; padding: 5px 10px; font-size: 10px; }
+        
+        /* MODAL */
+        #modal-inventario{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);display:none;z-index:3000;align-items:center;justify-content:center;}
+        .modal-content{background:#f1f5f9;width:96%;max-width:1150px;height:88vh;border-radius:20px;padding:24px 28px;overflow-y:auto;position:relative;}
+        .cerrar-modal{position:absolute;top:16px;right:20px;font-size:32px;cursor:pointer;color:var(--rojo);line-height:1;}
+        #grid-inventario{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-top:16px;}
+        .prod-card{background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,31,84,0.07);display:flex;flex-direction:column;border:1px solid #e2e8f0;transition:transform .15s,box-shadow .15s;}
+        .prod-card:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,31,84,0.14);}
+        .prod-img-wrap{width:100%;height:115px;background:#fff;display:flex;align-items:center;justify-content:center;border-bottom:1px solid #f1f5f9;overflow:hidden;}
+        .prod-img-wrap img{max-height:105px;max-width:90%;object-fit:contain;}
+        .prod-img-placeholder{font-size:42px;}
+        .spinner{width:26px;height:26px;border:3px solid #e2e8f0;border-top-color:var(--azul);border-radius:50%;animation:spin .8s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .prod-info{padding:9px 10px 5px;flex:1;}
+        .prod-nombre{font-size:11px;font-weight:700;color:var(--azul);line-height:1.3;margin-bottom:3px;min-height:26px;}
+        .prod-cod{font-size:9px;color:#94a3b8;font-family:monospace;margin-bottom:7px;}
+        .precio-row{display:flex;align-items:center;gap:4px;}
+        .precio-row input{padding:5px 6px;border:1.5px solid #cbd5e1;border-radius:7px;width:60px;font-size:13px;font-weight:700;}
+        .precio-row input:focus{outline:none;border-color:var(--azul);}
+        .iva-badge{background:var(--azul);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;}
+        .card-footer{padding:6px 10px 9px;}
+        .btn-borrar{width:100%;padding:5px;font-size:10px;background:#fee2e2;color:#b91c1c;border:none;border-radius:7px;cursor:pointer;font-weight:700;}
+        .btn-borrar:hover{background:#fca5a5;}
+        .status-bar{display:flex;align-items:center;gap:10px;background:white;border-radius:10px;padding:8px 14px;margin-top:10px;border:1px solid #e2e8f0;}
+        .status-bar span{font-size:12px;color:#475569;white-space:nowrap;}
+        .prog-wrap{flex:1;height:7px;background:#e2e8f0;border-radius:10px;overflow:hidden;}
+        .prog-fill{height:100%;background:var(--verde);border-radius:10px;transition:width .4s;width:0%;}
+
+        #msg-centro { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(30, 41, 59, 0.95); color: white; padding: 20px 40px; border-radius: 15px; display: none; z-index: 4000; text-align: center; }
+        #ticket-imprimible { display: none; }
+        @media print { body * { visibility: hidden; } #ticket-imprimible, #ticket-imprimible * { visibility: visible; } #ticket-imprimible { display: block !important; position: absolute; left: 0; top: 0; width: 80mm; padding: 10px; font-family: 'Courier New', monospace; font-size: 12px; color: black; } }
+
+        /* ── ESCÁNER CÁMARA ── */
+        #modal-scanner { position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);display:none;z-index:5000;align-items:center;justify-content:center;flex-direction:column; }
+        #modal-scanner.activo { display:flex; }
+        #scanner-region { width:min(90vw,400px);border-radius:16px;overflow:hidden;border:3px solid var(--verde); }
+        #scanner-region video { display:block;width:100%; }
+        #scanner-region canvas { display:none; }
+        #scanner-info { color:white;margin-top:14px;font-size:15px;text-align:center; }
+        #btn-cerrar-scanner { margin-top:18px;padding:12px 32px;background:var(--rojo);color:white;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer; }
+        .btn-camara { background: #7c3aed; color: white; }
+
+        /* ── RESPONSIVE MÓVIL ── */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            header { padding: 10px; flex-direction: column; gap: 6px; text-align: center; }
+            header h1 { font-size: 18px; }
+            .logo-pantalla { font-size: 36px; }
+            .container { grid-template-columns: 1fr; gap: 12px; }
+            .entrada-datos { grid-template-columns: 1fr 1fr; gap: 8px; }
+            .entrada-datos > div:nth-child(2) { grid-column: 1 / -1; }
+            .entrada-datos > button { grid-column: 1 / -1; }
+            .panel { padding: 14px; }
+            table th:nth-child(3), table td:nth-child(3),
+            table th:nth-child(4), table td:nth-child(4) { display:none; }
+            .btn { padding: 14px; font-size: 15px; }
+            .monto { font-size: 32px; }
+            .sidebar { order: -1; }
+        }
+    </style>
+</head>
+<body onload="inicializar()">
+
+<div id="msg-centro"></div>
+
+<!-- MODAL ESCÁNER CÁMARA -->
+<div id="modal-scanner">
+    <div id="scanner-region"></div>
+    <div id="scanner-info">📷 Apunta al código de barras o QR</div>
+    <button id="btn-cerrar-scanner" onclick="cerrarScanner()">✕ CANCELAR</button>
+</div>
+
+<div id="modal-inventario">
+    <div class="modal-content">
+        <span class="cerrar-modal" onclick="cerrarInventario()">×</span>
+        <h2 style="color:var(--azul);margin-top:0;margin-bottom:4px;">⚙️ GESTIÓN DE PRODUCTOS</h2>
+        <p style="margin:0;color:#64748b;font-size:13px;">Imágenes guardadas localmente. Solo se descargan una vez desde Open Food Facts.</p>
+        <div class="status-bar">
+            <span id="img-status-txt">—</span>
+            <div class="prog-wrap"><div class="prog-fill" id="img-prog"></div></div>
+            <button class="btn btn-azul" style="width:auto;padding:5px 12px;font-size:11px;margin:0;" onclick="recargarImagenes()">🔄 Recargar</button>
+        </div>
+        <div id="grid-inventario"></div>
+        <br>
+        <button class="btn btn-azul" onclick="cerrarInventario()">✅ LISTO, VOLVER A VENTAS</button>
+    </div>
+</div>
+
+<header class="no-print">
+    <div>
+        <h1 style="margin:0;"><span class="logo-pantalla">🏰</span> CASA TUDELA</h1>
+        <small>Propiedad de: <strong>Roberto García Sanz</strong> | v4.25 📱</small>
+    </div>
+    <div id="reloj" style="font-family: monospace; font-size: 15px;"></div>
+</header>
+
+<div class="container no-print">
+    <div class="panel">
+        <h3 style="margin-top:0; color:var(--azul)">🛒 VENTAS (LECTOR QR/BARRAS)</h3>
+        <button class="btn btn-camara" style="margin-bottom:12px;" onclick="abrirScanner()">📷 ESCANEAR CON CÁMARA</button>
+        <div class="entrada-datos">
+            <div><label>Código</label><input type="text" id="p-cod" onkeypress="if(event.key==='Enter') buscar(event)" autofocus></div>
+            <div><label>Producto</label><input type="text" id="p-nom"></div>
+            <div><label>IVA</label>
+                <select id="p-iva"><option value="10">10%</option><option value="4">4%</option><option value="21">21%</option></select>
+            </div>
+            <div><label>Precio</label><input type="number" id="p-pre" step="0.01" onkeypress="if(event.key==='Enter') añadirManual()"></div>
+            <button class="btn btn-azul" onclick="añadirManual()">AÑADIR</button>
+        </div>
+        <table>
+            <thead><tr><th style="width:50px">Cant.</th><th>Descripción</th><th style="text-align:center">IVA</th><th style="text-align:right">Unit.</th><th style="text-align:right">Total</th><th></th></tr></thead>
+            <tbody id="cuerpo-tabla"></tbody>
+        </table>
+    </div>
+
+    <div class="sidebar">
+        <div class="total-box">
+            <span>TOTAL COMPRA</span>
+            <span class="monto" id="v-total">0,00€</span>
+            <span id="v-items">0 artículos</span>
+        </div>
+        <button class="btn btn-cobrar" onclick="cobrar()">✅ REGISTRAR COMPRA</button>
+        <button class="btn btn-azul" onclick="handlePrint()">🖨️ IMPRIMIR TICKET</button>
+        <button class="btn btn-gris" onclick="verCaja()">📊 GASTO HOY</button>
+        <hr>
+        <button class="btn btn-gris" style="background:#1e293b" onclick="abrirInventario()">⚙️ GESTIÓN INVENTARIO</button>
+        <button class="btn btn-gris" onclick="descargarExcel()">📥 EXCEL VENTAS</button>
+    </div>
+</div>
+
+<footer class="no-print" style="text-align:center; margin-top:30px; font-size:12px; color:#64748b;">
+    © 2026 CASA TUDELA - Roberto García Sanz.
+</footer>
+
+<div id="ticket-imprimible">
+    <center><span style="font-size:25px">🏰</span><br><strong>CASA TUDELA</strong><br>NIF: B47489612<hr><div id="t-fecha"></div><hr></center>
+    <table style="width:100%; border:none;"><tbody id="t-lista"></tbody></table>
+    <hr><div style="text-align:right; font-weight:bold;">TOTAL: <span id="t-total">0,00€</span></div>
+    <br><center><div id="t-qr-print"></div><br>¡Gracias!</center>
+</div>
+
+<script>
+    let carrito = [];
+    const baseInventario = [
+        {"cod": "8410436392693", "nom": "Lejia Multiusos 2Litros", "pre": 3.6, "iva": 10},
+        {"cod": "4084500617421", "nom": "Fairy 820", "pre": 3.95, "iva": 10},
+        {"cod": "8413402980306", "nom": "Agua San Joaquin 1.5L", "pre": 0.75, "iva": 10},
+        {"cod": "8410379942788", "nom": "Auchan Leche 1L", "pre": 1.56, "iva": 10},
+        {"cod": "8435177059216", "nom": "Nueces Cáscara de Auchan", "pre": 3.45, "iva": 10},
+        {"cod": "8433111000188", "nom": "Papel de Cocina Auchan 90m", "pre": 2.9, "iva": 10},
+        {"cod": "8437015354477", "nom": "12 Huevos Gallina C", "pre": 3.69, "iva": 4},
+        {"cod": "8410500025809", "nom": "Casa Oikos Sabor Lima Limon X4", "pre": 2.49, "iva": 4},
+        {"cod": "8410352208337", "nom": "Auchan Aceite Oliva 1L", "pre": 4.35, "iva": 4},
+        {"cod": "8429583008760", "nom": "BONITO NORTE MSC", "pre": 7.52, "iva": 10},
+        {"cod": "8411293020170", "nom": "MANTEQUILLA C/SAL 250G", "pre": 2.24, "iva": 10},
+        {"cod": "8410416014614", "nom": "Tomate frito 550g", "pre": 0.88, "iva": 10},
+        {"cod": "8435177019210", "nom": "Naranja Lane-Tarde 4K Auchan", "pre": 4.99, "iva": 4},
+        {"cod": "8411921509855", "nom": "BOLSA 50X60CM", "pre": 0.12, "iva": 21},
+        {"cod": "2073228001751", "nom": "PAN PARIS", "pre": 1.75, "iva": 4}
+    ];
+
+    let inventarioOficial = [];
+
+    function inicializar() {
+        const guardadosNuevos = JSON.parse(localStorage.getItem('prod_nuevos')) || [];
+        const guardadosViejos = JSON.parse(localStorage.getItem('inventarioPersonalizado')) || [];
+        let combinados = [...baseInventario];
+        [...guardadosNuevos, ...guardadosViejos].forEach(p => {
+            const idx = combinados.findIndex(b => String(b.cod) === String(p.cod));
+            if (idx !== -1) combinados[idx] = p; else combinados.push(p);
+        });
+        inventarioOficial = combinados;
+        actualizarTablaInventario();
+        toast("✅ DATOS LISTOS");
+    }
+
+    // ─── INVENTARIO CON IMÁGENES ───────────────────────────────────────────────
+
+    // Caché de imágenes en Base64 guardadas en localStorage
+    // Solo se descargan UNA VEZ; después arrancan al instante desde disco local
+    let imgCache = {};
+    try { imgCache = JSON.parse(localStorage.getItem('img_b64') || '{}'); } catch(e) {}
+
+    function abrirInventario() {
+        document.getElementById('modal-inventario').style.display = 'flex';
+        renderGrid();
+        cargarImagenesAuto();
+    }
+    function cerrarInventario() {
+        document.getElementById('modal-inventario').style.display = 'none';
+        document.getElementById('p-cod').focus();
+    }
+    function recargarImagenes() {
+        imgCache = {};
+        localStorage.removeItem('img_b64');
+        renderGrid();
+        cargarImagenesAuto();
+    }
+
+    // Construye las URLs candidatas de Open Food Facts para un EAN-13
+    function offUrls(cod) {
+        const s = String(cod).padStart(13,'0');
+        const p = `https://images.openfoodfacts.org/images/products/${s.slice(0,3)}/${s.slice(3,6)}/${s.slice(6,9)}/${s.slice(9)}`;
+        return [
+            p+'/front_es.400.jpg', p+'/front_es.200.jpg',
+            p+'/front.400.jpg',    p+'/front.200.jpg',
+            p+'/1.400.jpg',        p+'/1.200.jpg'
+        ];
+    }
+
+    // Convierte una URL de imagen a base64 mediante un canvas (sin CORS restrictions en imágenes)
+    function urlToB64(url) {
+        return new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => {
+                const MAX = 120;
+                let w = img.naturalWidth, h = img.naturalHeight;
+                if (w > h) { h = Math.round(h * MAX/w); w = MAX; }
+                else       { w = Math.round(w * MAX/h); h = MAX; }
+                const c = document.createElement('canvas');
+                c.width = w; c.height = h;
+                c.getContext('2d').drawImage(img, 0, 0, w, h);
+                try { resolve(c.toDataURL('image/webp', 0.75)); }
+                catch(e) { resolve(null); }
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+    }
+
+    // Intenta cargar imagen desde las URLs candidatas, devuelve base64 o null
+    async function fetchImgB64(cod) {
+        for (const url of offUrls(cod)) {
+            const b64 = await urlToB64(url);
+            if (b64 && b64.length > 500) return b64;
+        }
+        return null;
+    }
+
+    // Renderiza la rejilla de tarjetas con lo que hay en caché
+    function renderGrid() {
+        const grid = document.getElementById('grid-inventario');
+        grid.innerHTML = '';
+        inventarioOficial.forEach((p, idx) => {
+            const cached = imgCache[p.cod];
+            let imgHtml;
+            if (cached === 'X') {
+                imgHtml = `<span class="prod-img-placeholder">🛒</span>`;
+            } else if (cached) {
+                imgHtml = `<img src="${cached}" alt="${p.nom}">`;
+            } else {
+                imgHtml = `<div class="spinner" id="sp-${idx}"></div>`;
+            }
+            grid.innerHTML += `
+            <div class="prod-card" id="card-${idx}">
+                <div class="prod-img-wrap" id="iw-${idx}">${imgHtml}</div>
+                <div class="prod-info">
+                    <div class="prod-nombre">${p.nom}</div>
+                    <div class="prod-cod">${p.cod||'—'}</div>
+                    <div class="precio-row">
+                        <input type="number" value="${p.pre.toFixed(2)}" step="0.01" min="0"
+                               onchange="modificarPrecio(${idx},this.value)">
+                        <span style="font-size:12px;color:#64748b">€</span>
+                        <span class="iva-badge">${p.iva}%</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn-borrar" onclick="eliminarProducto(${idx})">🗑 Borrar</button>
+                </div>
+            </div>`;
+        });
+    }
+
+    // Descarga y guarda en localStorage las imágenes que faltan
+    async function cargarImagenesAuto() {
+        const total = inventarioOficial.length;
+        const statusTxt = document.getElementById('img-status-txt');
+        const progBar   = document.getElementById('img-prog');
+
+        const pendientes = inventarioOficial.filter(p => p.cod && imgCache[p.cod] === undefined);
+
+        if (!pendientes.length) {
+            const n = Object.values(imgCache).filter(v=>v&&v!=='X').length;
+            if(statusTxt) statusTxt.innerText = `✅ ${n}/${total} con imagen guardada`;
+            if(progBar) progBar.style.width = '100%';
+            return;
+        }
+
+        let done = Object.keys(imgCache).length;
+
+        for (let idx = 0; idx < inventarioOficial.length; idx++) {
+            const p = inventarioOficial[idx];
+            if (!p.cod || imgCache[p.cod] !== undefined) {
+                done++;
+                continue;
+            }
+
+            const iw = document.getElementById(`iw-${idx}`);
+            const b64 = await fetchImgB64(p.cod);
+
+            imgCache[p.cod] = b64 || 'X';
+            if (iw) {
+                iw.innerHTML = b64
+                    ? `<img src="${b64}" alt="${p.nom}">`
+                    : `<span class="prod-img-placeholder">🛒</span>`;
+            }
+
+            done++;
+            const pct = Math.round(done/total*100);
+            if(statusTxt) statusTxt.innerText = `🔍 Descargando... ${done}/${total}`;
+            if(progBar) progBar.style.width = pct+'%';
+        }
+
+        // Guardar todo en localStorage — quedan incrustadas para siempre
+        try { localStorage.setItem('img_b64', JSON.stringify(imgCache)); } catch(e) {}
+
+        const n = Object.values(imgCache).filter(v=>v&&v!=='X').length;
+        if(statusTxt) statusTxt.innerText = `✅ ${n}/${total} imágenes guardadas permanentemente`;
+        if(progBar) progBar.style.width = '100%';
+    }
+
+    function actualizarTablaInventario() { /* retrocompatibilidad */ }
+    function modificarPrecio(idx, v) { inventarioOficial[idx].pre = parseFloat(v); guardar(); toast("💰 PRECIO ACTUALIZADO"); }
+    function eliminarProducto(idx) {
+        if(confirm("¿Borrar este producto?")) {
+            inventarioOficial.splice(idx,1);
+            guardar();
+            renderGrid();
+            toast("🗑 PRODUCTO BORRADO");
+        }
+    }
+    
+    function guardar() {
+        const mod = inventarioOficial.filter(p => {
+            const orig = baseInventario.find(b => b.cod === p.cod);
+            return !orig || orig.pre !== p.pre || orig.nom !== p.nom;
+        });
+        localStorage.setItem('prod_nuevos', JSON.stringify(mod));
+    }
+
+    function toast(m) { 
+        const e = document.getElementById('msg-centro'); e.innerText = m; e.style.display = 'block'; 
+        setTimeout(() => e.style.display = 'none', 1500); 
+    }
+
+    function buscar(e) {
+        if (e) e.preventDefault();
+        const c = document.getElementById('p-cod').value.trim();
+        const p = inventarioOficial.find(x => String(x.cod) === String(c));
+        if (p) {
+            añadirAlCarrito(p.nom, p.pre, p.iva);
+            document.getElementById('p-cod').value = "";
+        } else { toast("NO ENCONTRADO"); document.getElementById('p-nom').focus(); }
+    }
+
+    function añadirManual() {
+        const cod = document.getElementById('p-cod').value.trim();
+        const nom = document.getElementById('p-nom').value.trim();
+        const pre = parseFloat(document.getElementById('p-pre').value);
+        const iva = parseInt(document.getElementById('p-iva').value);
+        if (nom && !isNaN(pre)) {
+            if (!inventarioOficial.find(x => x.cod === cod && cod !== "")) {
+                inventarioOficial.push({ cod, nom, pre, iva });
+                guardar();
+                actualizarTablaInventario();
+            }
+            añadirAlCarrito(nom, pre, iva);
+            ['p-cod','p-nom','p-pre'].forEach(id => document.getElementById(id).value = "");
+            document.getElementById('p-cod').focus();
+        }
+    }
+
+    function añadirAlCarrito(nom, pre, iva) {
+        let it = carrito.find(x => x.nom === nom);
+        it ? it.cant++ : carrito.push({ nom, pre, iva, cant: 1 });
+        actualizarUI();
+    }
+
+    function actualizarUI() {
+        const c = document.getElementById('cuerpo-tabla'); c.innerHTML = '';
+        let t = 0, n = 0;
+        carrito.forEach((it, i) => {
+            let s = it.pre * it.cant; t += s; n += it.cant;
+            c.innerHTML += `<tr><td>${it.cant}x</td><td>${it.nom}</td><td align="center">${it.iva}%</td><td align="right">${it.pre.toFixed(2)}€</td><td align="right">${s.toFixed(2)}€</td><td><button onclick="carrito.splice(${i},1);actualizarUI()" style="border:none; background:none; color:red; cursor:pointer;">✕</button></td></tr>`;
+        });
+        document.getElementById('v-total').innerText = t.toFixed(2).replace('.', ',') + '€';
+        document.getElementById('v-items').innerText = n + " artículos";
+    }
+
+    function handlePrint() {
+        if (carrito.length === 0) return;
+        const f = new Date().toLocaleString();
+        document.getElementById('t-fecha').innerText = f;
+        const tl = document.getElementById('t-lista'); tl.innerHTML = '';
+        let txt = "CASA TUDELA\n" + f + "\n---\n";
+        carrito.forEach(it => { 
+            const s = (it.pre*it.cant).toFixed(2);
+            tl.innerHTML += `<tr><td>${it.cant}x</td><td>${it.nom.substring(0,14)}</td><td align="right">${it.iva}%</td><td align="right">${s}€</td></tr>`; 
+            txt += `${it.cant}x ${it.nom} - ${s}€\n`;
+        });
+        const tot = document.getElementById('v-total').innerText;
+        document.getElementById('t-total').innerText = tot;
+        txt += "---\nTOTAL: " + tot;
+        const qr = qrcode(0, 'M'); qr.addData(txt); qr.make();
+        document.getElementById('t-qr-print').innerHTML = qr.createImgTag(5);
+        setTimeout(() => { window.print(); }, 300);
+    }
+
+    function cobrar() {
+        if(carrito.length === 0) return;
+        let v = JSON.parse(localStorage.getItem('v_casa')) || [];
+        v.push({fecha: new Date().toLocaleString(), total: carrito.reduce((a,b)=>a+(b.pre*b.cant),0), detalles: carrito.map(p => p.cant + "x " + p.nom).join(" | ")});
+        localStorage.setItem('v_casa', JSON.stringify(v));
+        carrito = []; actualizarUI(); toast("✅ VENTA REGISTRADA");
+        document.getElementById('p-cod').focus();
+    }
+
+    function descargarExcel() {
+        let csv = "Fecha;Productos;Total\n";
+        let ventas = JSON.parse(localStorage.getItem('v_casa')) || [];
+        ventas.forEach(s => { csv += s.fecha + ";" + (s.detalles || "") + ";" + s.total.toFixed(2).replace('.', ',') + "€\n"; });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(new Blob(["\ufeff" + csv], {type:'text/csv;charset=utf-8;'}));
+        a.download = "Ventas_CasaTudela.csv"; a.click();
+    }
+
+    function verCaja() {
+        let v = JSON.parse(localStorage.getItem('v_casa')) || [];
+        let t = v.reduce((a,b) => b.fecha.includes(new Date().toLocaleDateString()) ? a + b.total : a, 0);
+        toast("💰 HOY: " + t.toFixed(2).replace('.', ',') + "€");
+    }
+
+    // ── ESCÁNER DE CÁMARA (html5-qrcode) ──────────────────────────────────────
+    let html5QrCode = null;
+    let scannerActivo = false;
+
+    function abrirScanner() {
+        const modal = document.getElementById('modal-scanner');
+        modal.classList.add('activo');
+
+        html5QrCode = new Html5Qrcode("scanner-region");
+
+        Html5Qrcode.getCameras().then(cameras => {
+            if (!cameras || cameras.length === 0) {
+                document.getElementById('scanner-info').innerText = '❌ No se encontró cámara';
+                return;
+            }
+            // Preferir cámara trasera
+            const cam = cameras.find(c => /back|rear|environment/i.test(c.label)) || cameras[cameras.length - 1];
+
+            html5QrCode.start(
+                { deviceId: { exact: cam.id } },
+                { fps: 12, qrbox: { width: 260, height: 180 }, aspectRatio: 1.5 },
+                (codigoDecodificado) => {
+                    onCodigoEscaneado(codigoDecodificado);
+                },
+                () => {} // error silencioso en cada frame
+            ).then(() => {
+                scannerActivo = true;
+                document.getElementById('scanner-info').innerText = '📷 Apunta al código de barras o QR';
+            }).catch(err => {
+                document.getElementById('scanner-info').innerText = '❌ Error: ' + err;
+            });
+        }).catch(() => {
+            document.getElementById('scanner-info').innerText = '❌ Sin permiso de cámara';
+        });
+    }
+
+    function cerrarScanner() {
+        if (html5QrCode && scannerActivo) {
+            html5QrCode.stop().then(() => {
+                html5QrCode.clear();
+                html5QrCode = null;
+                scannerActivo = false;
+            }).catch(() => {});
+        }
+        document.getElementById('modal-scanner').classList.remove('activo');
+    }
+
+    function onCodigoEscaneado(codigo) {
+        if (!scannerActivo) return;
+        // Vibrar si disponible
+        if (navigator.vibrate) navigator.vibrate(100);
+
+        document.getElementById('scanner-info').innerText = '✅ Código: ' + codigo;
+        document.getElementById('p-cod').value = codigo;
+
+        const p = inventarioOficial.find(x => String(x.cod) === String(codigo));
+        if (p) {
+            añadirAlCarrito(p.nom, p.pre, p.iva);
+            setTimeout(() => {
+                document.getElementById('scanner-info').innerText = '📷 Apunta al siguiente código';
+            }, 1000);
+        } else {
+            // Producto no encontrado: cerrar para rellenar manualmente
+            cerrarScanner();
+            document.getElementById('p-nom').focus();
+            toast("⚠️ NO ENCONTRADO — Rellena el nombre y precio");
+        }
+    }
+
+    setInterval(() => document.getElementById('reloj').innerText = new Date().toLocaleString(), 1000);
+</script>
+</body>
+</html>
