@@ -1,606 +1,831 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CASA TUDELA · Móvil</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <style>
-        :root { --azul:#001f54; --verde:#10b981; --fondo:#f1f5f9; --rojo:#ef4444; }
-        * { box-sizing: border-box; }
-        body { font-family:'Segoe UI',sans-serif; background:var(--fondo); margin:0; padding:10px; color:#1e293b; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Casa Tudela — Productos del Hogar · Salamanca, Castilla y León</title>
+  <meta name="description" content="Casa Tudela, tu tienda de productos del hogar en Salamanca. Calidad, proximidad y atención personal desde 2026. Ven a visitarnos.">
+  <meta name="keywords" content="casa tudela, tienda hogar, productos limpieza, salamanca, alimentación">
+  <meta property="og:title" content="Casa Tudela — Productos del Hogar">
+  <meta property="og:description" content="Tu tienda de confianza en Tudela. Productos de calidad, trato cercano.">
+  <meta property="og:type" content="website">
 
-        /* HEADER */
-        header { background:var(--azul); color:white; padding:10px 14px; border-radius:12px;
-                 display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-        header h1 { margin:0; font-size:18px; }
-        #reloj { font-family:monospace; font-size:12px; color:#94a3b8; }
+  <!-- Google Fonts: Cormorant (display elegante) + DM Sans (cuerpo legible) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-        /* BOTÓN ESCANEAR — protagonista en móvil */
-        #btn-scan { width:100%; padding:16px; background:var(--verde); color:white; border:none;
-                    border-radius:14px; font-size:18px; font-weight:900; cursor:pointer;
-                    margin-bottom:10px; letter-spacing:1px; }
+  <style>
+    /* ══════════════════════════════════════════
+       TOKENS & RESET
+    ══════════════════════════════════════════ */
+    :root {
+      --azul:      #001f54;
+      --azul-mid:  #0a3272;
+      --oro:       #c9a84c;
+      --oro-claro: #e8d5a3;
+      --crema:     #faf7f2;
+      --blanco:    #ffffff;
+      --gris:      #64748b;
+      --gris-claro:#f1f5f9;
+      --texto:     #1a1a2e;
+      --verde:     #10b981;
 
-        /* FORMULARIO MANUAL */
-        .entrada { background:#cbd5e1; padding:12px; border-radius:12px; margin-bottom:12px; }
-        .fila2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
-        .fila3 { display:grid; grid-template-columns:2fr 1fr 1fr; gap:8px; margin-bottom:8px; }
-        label { font-size:10px; font-weight:800; color:var(--azul); display:block; margin-bottom:3px; }
-        input, select { padding:10px; border:1.5px solid #94a3b8; border-radius:8px;
-                        width:100%; font-size:14px; }
-        input:focus, select:focus { outline:none; border-color:var(--azul); }
-        #btn-añadir { width:100%; padding:12px; background:var(--azul); color:white;
-                      border:none; border-radius:10px; font-size:15px; font-weight:700; cursor:pointer; }
+      --f-display: 'Cormorant Garamond', Georgia, serif;
+      --f-body:    'DM Sans', system-ui, sans-serif;
 
-        /* CARRITO */
-        .panel { background:white; border-radius:16px; padding:14px;
-                 box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:12px; }
-        .panel h3 { margin:0 0 10px; color:var(--azul); font-size:15px; }
-        table { width:100%; border-collapse:collapse; font-size:13px; }
-        th { border-bottom:2px solid var(--azul); padding:6px 4px; color:var(--azul); text-align:left; }
-        td { padding:7px 4px; border-bottom:1px solid #e2e8f0; }
+      --radio:  14px;
+      --sombra: 0 8px 40px rgba(0,31,84,0.10);
+      --trans:  0.35s cubic-bezier(.4,0,.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--f-body);
+      background: var(--crema);
+      color: var(--texto);
+      overflow-x: hidden;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    img { display: block; max-width: 100%; }
+    a  { color: inherit; text-decoration: none; }
 
-        /* TOTAL */
-        .total-box { background:#1e293b; color:white; border-radius:16px; padding:16px;
-                     text-align:center; border:2px solid var(--verde); margin-bottom:10px; }
-        .monto { font-size:38px; font-weight:900; color:var(--verde); display:block; }
-        .items  { font-size:13px; color:#94a3b8; }
+    /* ══════════════════════════════════════════
+       NAV
+    ══════════════════════════════════════════ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 5vw;
+      height: 68px;
+      background: rgba(0,31,84,0.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(201,168,76,0.25);
+      transition: var(--trans);
+    }
+    .nav-logo {
+      font-family: var(--f-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--blanco);
+      letter-spacing: .04em;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo span { color: var(--oro); }
+    .nav-links {
+      display: flex; gap: 2rem; list-style: none;
+    }
+    .nav-links a {
+      font-size: .88rem; font-weight: 500; letter-spacing: .06em;
+      color: rgba(255,255,255,.75); text-transform: uppercase;
+      transition: color var(--trans);
+    }
+    .nav-links a:hover { color: var(--oro); }
+    .nav-cta {
+      background: var(--oro); color: var(--azul) !important;
+      padding: 8px 20px; border-radius: 50px;
+      font-weight: 600 !important; color: var(--azul);
+      transition: background var(--trans), transform var(--trans) !important;
+    }
+    .nav-cta:hover { background: var(--oro-claro) !important; transform: translateY(-1px); }
+    .nav-burger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+    .nav-burger span { width: 24px; height: 2px; background: white; border-radius: 2px; transition: var(--trans); }
 
-        /* BOTONES ACCIÓN */
-        .btn { width:100%; padding:13px; border-radius:10px; border:none; font-weight:700;
-               cursor:pointer; font-size:14px; margin-bottom:8px; }
-        .btn-verde  { background:var(--verde); color:white; font-size:16px; }
-        .btn-azul   { background:#3b82f6; color:white; }
-        .btn-gris   { background:#64748b; color:white; }
-        .btn-oscuro { background:#1e293b; color:white; }
+    /* ══════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      background:
+        linear-gradient(160deg, rgba(0,31,84,0.93) 0%, rgba(0,31,84,0.70) 55%, rgba(0,31,84,0.40) 100%),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Cdefs%3E%3CradialGradient id='a' cx='30%25' cy='40%25' r='60%25'%3E%3Cstop offset='0' stop-color='%23c9a84c' stop-opacity='.18'/%3E%3Cstop offset='1' stop-color='%23001f54' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='800' height='600' fill='%23001f54'/%3E%3Crect width='800' height='600' fill='url(%23a)'/%3E%3Ccircle cx='600' cy='100' r='200' fill='%23c9a84c' opacity='.06'/%3E%3Ccircle cx='100' cy='500' r='150' fill='%2310b981' opacity='.05'/%3E%3C/svg%3E") center/cover;
+      display: flex; align-items: center;
+      padding: 120px 5vw 80px;
+      position: relative; overflow: hidden;
+    }
+    /* Patrón de puntos sutil */
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(201,168,76,.15) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+    .hero-content {
+      position: relative; z-index: 1;
+      max-width: 680px;
+      animation: fadeUp .9s ease both;
+    }
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(201,168,76,.15); border: 1px solid rgba(201,168,76,.4);
+      color: var(--oro-claro); font-size: .8rem; font-weight: 500;
+      letter-spacing: .1em; text-transform: uppercase;
+      padding: 6px 14px; border-radius: 50px; margin-bottom: 24px;
+    }
+    .hero-tag::before { content: '●'; color: var(--oro); font-size: .6rem; }
+    .hero h1 {
+      font-family: var(--f-display);
+      font-size: clamp(3rem, 7vw, 5.5rem);
+      font-weight: 700; line-height: 1.05;
+      color: var(--blanco);
+      margin-bottom: 20px;
+      letter-spacing: -.01em;
+    }
+    .hero h1 em { color: var(--oro); font-style: italic; }
+    .hero p {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: rgba(255,255,255,.80);
+      max-width: 520px; margin-bottom: 40px;
+      font-weight: 300; line-height: 1.8;
+    }
+    .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-oro {
+      background: var(--oro); color: var(--azul);
+      padding: 15px 34px; border-radius: 50px;
+      font-weight: 600; font-size: 1rem; letter-spacing: .03em;
+      border: none; cursor: pointer;
+      transition: transform var(--trans), box-shadow var(--trans), background var(--trans);
+      box-shadow: 0 4px 20px rgba(201,168,76,.4);
+    }
+    .btn-oro:hover { transform: translateY(-3px); background: var(--oro-claro); box-shadow: 0 8px 32px rgba(201,168,76,.5); }
+    .btn-outline {
+      background: transparent; color: var(--blanco);
+      padding: 14px 32px; border-radius: 50px;
+      font-weight: 500; font-size: 1rem;
+      border: 1.5px solid rgba(255,255,255,.4);
+      cursor: pointer;
+      transition: border-color var(--trans), background var(--trans);
+    }
+    .btn-outline:hover { border-color: white; background: rgba(255,255,255,.08); }
 
-        /* MODAL ESCÁNER */
-        #modal-scanner { position:fixed;top:0;left:0;width:100%;height:100%;
-                         background:rgba(0,0,0,0.92);display:none;z-index:5000;
-                         align-items:center;justify-content:center;flex-direction:column; }
-        #modal-scanner.activo { display:flex; }
-        #scanner-region { width:min(92vw,380px); border-radius:14px; overflow:hidden;
-                          border:3px solid var(--verde); }
-        #scanner-info { color:white; margin-top:14px; font-size:15px;
-                        text-align:center; padding:0 20px; min-height:24px; }
-        #btn-cerrar-scanner { margin-top:18px; padding:13px 36px; background:var(--rojo);
-                              color:white; border:none; border-radius:10px;
-                              font-size:16px; font-weight:bold; cursor:pointer; }
+    /* Stats en el hero */
+    .hero-stats {
+      display: flex; gap: 36px; margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,.15);
+      flex-wrap: wrap;
+    }
+    .stat { }
+    .stat-num {
+      font-family: var(--f-display);
+      font-size: 2.2rem; font-weight: 700;
+      color: var(--oro); line-height: 1;
+    }
+    .stat-label { font-size: .82rem; color: rgba(255,255,255,.6); margin-top: 4px; }
 
-        /* MODAL INVENTARIO */
-        #modal-inventario { position:fixed;top:0;left:0;width:100%;height:100%;
-                            background:rgba(0,0,0,0.75);display:none;z-index:3000;
-                            align-items:center;justify-content:center; }
-        #modal-inventario.activo { display:flex; }
-        .modal-content { background:#f1f5f9; width:96%; max-width:600px; height:92vh;
-                         border-radius:18px; padding:14px 16px; overflow-y:auto; position:relative; }
-        .cerrar-modal { position:absolute;top:12px;right:14px;font-size:30px;
-                        cursor:pointer;color:var(--rojo); }
-        #inv-buscar { width:100%;padding:10px 14px;border:1.5px solid #cbd5e1;
-                      border-radius:10px;font-size:15px;margin:10px 0 8px; }
-        #inv-buscar:focus { outline:none; border-color:var(--azul); }
-        .inv-contador { font-size:12px;color:#64748b;margin-bottom:8px; }
-        #lista-inventario { display:flex;flex-direction:column;gap:5px; }
-        .inv-fila { display:grid;grid-template-columns:1fr 84px 48px 36px;gap:6px;
-                    align-items:center;background:white;border-radius:10px;
-                    padding:8px 10px;border:1px solid #e2e8f0; }
-        .inv-fila:nth-child(even) { background:#f8fafc; }
-        .inv-nom { font-size:13px;font-weight:700;color:var(--azul);
-                   white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
-        .inv-cod { font-size:10px;color:#94a3b8;font-family:monospace; }
-        .inv-pre { padding:5px 6px;border:1.5px solid #cbd5e1;border-radius:7px;
-                   width:100%;font-size:14px;font-weight:700;text-align:right; }
-        .inv-pre:focus { outline:none;border-color:var(--azul); }
-        .iva-badge { background:var(--azul);color:#fff;font-size:10px;font-weight:800;
-                     padding:3px 6px;border-radius:20px;text-align:center; }
-        .btn-del { background:#fee2e2;color:#b91c1c;border:none;border-radius:7px;
-                   cursor:pointer;font-size:16px;padding:4px 8px; }
+    /* Scroll indicator */
+    .scroll-hint {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      color: rgba(255,255,255,.4); font-size: .75rem; letter-spacing: .1em;
+      text-transform: uppercase; animation: bounce 2s infinite;
+    }
+    .scroll-hint::after {
+      content: '↓'; font-size: 1.2rem; color: var(--oro);
+    }
 
-        /* TOAST */
-        #toast { position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-                 background:rgba(30,41,59,0.95);color:white;padding:14px 24px;
-                 border-radius:14px;display:none;z-index:6000;text-align:center;
-                 font-size:14px;font-weight:600;max-width:90vw; }
+    /* ══════════════════════════════════════════
+       SECCIÓN GENÉRICA
+    ══════════════════════════════════════════ */
+    section { padding: 96px 5vw; }
+    .section-tag {
+      display: inline-block;
+      font-size: .78rem; font-weight: 600; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--oro);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: var(--f-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 700; line-height: 1.15;
+      color: var(--azul); margin-bottom: 16px;
+    }
+    .section-title em { font-style: italic; color: var(--oro); }
+    .section-sub {
+      font-size: 1.05rem; color: var(--gris);
+      max-width: 560px; line-height: 1.8; margin-bottom: 56px;
+    }
 
-        /* PRINT */
-        #ticket-imprimible { display:none; }
-        @media print {
-            @page { size:80mm auto; margin:0; }
-            html, body {
-                width:80mm !important;
-                height:auto !important;
-                overflow:hidden !important;
-                margin:0 !important; padding:0 !important;
-            }
-            body * { display:none !important; }
-            #ticket-imprimible {
-                display:block !important;
-                visibility:visible !important;
-                position:static !important;
-                width:80mm !important;
-                padding:6px 10px !important;
-                font-family:'Courier New',monospace !important;
-                font-size:11px !important;
-                color:black !important;
-                margin:0 !important;
-            }
-            #ticket-imprimible * {
-                display:revert !important;
-                visibility:visible !important;
-            }
-        }
-    </style>
+    /* ══════════════════════════════════════════
+       CARACTERÍSTICAS
+    ══════════════════════════════════════════ */
+    .features { background: var(--blanco); }
+    .features-header { text-align: center; }
+    .features-header .section-sub { margin-left: auto; margin-right: auto; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .feat-card {
+      background: var(--crema);
+      border: 1px solid rgba(0,31,84,.08);
+      border-radius: var(--radio);
+      padding: 36px 28px;
+      transition: transform var(--trans), box-shadow var(--trans), border-color var(--trans);
+      position: relative; overflow: hidden;
+    }
+    .feat-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--azul), var(--oro));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform var(--trans);
+    }
+    .feat-card:hover { transform: translateY(-6px); box-shadow: var(--sombra); border-color: rgba(201,168,76,.3); }
+    .feat-card:hover::before { transform: scaleX(1); }
+    .feat-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: var(--azul); display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin-bottom: 20px;
+    }
+    .feat-title {
+      font-family: var(--f-display); font-size: 1.35rem; font-weight: 600;
+      color: var(--azul); margin-bottom: 10px;
+    }
+    .feat-desc { font-size: .92rem; color: var(--gris); line-height: 1.75; }
+
+    /* ══════════════════════════════════════════
+       PRODUCTOS DESTACADOS
+    ══════════════════════════════════════════ */
+    .productos { background: var(--crema); }
+    .productos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+    }
+    .prod-card {
+      background: var(--blanco);
+      border-radius: var(--radio);
+      overflow: hidden;
+      border: 1px solid rgba(0,31,84,.07);
+      transition: transform var(--trans), box-shadow var(--trans);
+    }
+    .prod-card:hover { transform: translateY(-5px); box-shadow: var(--sombra); }
+    .prod-img {
+      height: 160px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem;
+      background: linear-gradient(135deg, var(--gris-claro), #e8eef5);
+    }
+    .prod-body { padding: 16px 18px 20px; }
+    .prod-cat {
+      font-size: .72rem; font-weight: 600; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--oro); margin-bottom: 6px;
+    }
+    .prod-name {
+      font-family: var(--f-display); font-size: 1.1rem; font-weight: 600;
+      color: var(--azul); margin-bottom: 8px;
+    }
+    .prod-precio {
+      font-size: 1.25rem; font-weight: 700; color: var(--verde);
+    }
+
+    /* ══════════════════════════════════════════
+       SOBRE NOSOTROS — split layout
+    ══════════════════════════════════════════ */
+    .sobre {
+      background: var(--azul);
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0; padding: 0;
+    }
+    .sobre-texto {
+      padding: 96px 5vw 96px 5vw;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .sobre-texto .section-tag { color: var(--oro-claro); }
+    .sobre-texto .section-title { color: var(--blanco); }
+    .sobre-texto .section-sub { color: rgba(255,255,255,.7); margin-bottom: 36px; }
+    .sobre-lista { list-style: none; display: flex; flex-direction: column; gap: 14px; margin-bottom: 40px; }
+    .sobre-lista li {
+      display: flex; align-items: flex-start; gap: 12px;
+      color: rgba(255,255,255,.85); font-size: .95rem;
+    }
+    .sobre-lista li::before {
+      content: '✓';
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--oro); color: var(--azul);
+      font-size: .75rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .sobre-visual {
+      background:
+        linear-gradient(135deg, rgba(201,168,76,.12) 0%, rgba(16,185,129,.08) 100%),
+        var(--azul-mid);
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+      min-height: 480px;
+    }
+    .sobre-visual::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(201,168,76,.12) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .castillo-grande {
+      position: relative; z-index: 1;
+      font-size: 9rem; filter: drop-shadow(0 20px 60px rgba(0,0,0,.4));
+      animation: float 4s ease-in-out infinite;
+    }
+    .sobre-badge {
+      position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+      background: rgba(201,168,76,.15); border: 1px solid rgba(201,168,76,.4);
+      border-radius: 50px; padding: 10px 24px;
+      color: var(--oro-claro); font-size: .85rem; font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* ══════════════════════════════════════════
+       TESTIMONIOS
+    ══════════════════════════════════════════ */
+    .testimonios { background: var(--blanco); }
+    .test-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .test-card {
+      background: var(--crema);
+      border-radius: var(--radio);
+      padding: 32px 28px;
+      border: 1px solid rgba(0,31,84,.07);
+      position: relative;
+    }
+    .test-card::before {
+      content: '"';
+      font-family: var(--f-display); font-size: 6rem; font-weight: 700;
+      color: var(--oro); opacity: .25;
+      position: absolute; top: -10px; left: 20px; line-height: 1;
+    }
+    .test-texto {
+      font-size: .95rem; color: var(--gris); line-height: 1.8;
+      margin-bottom: 20px; position: relative; z-index: 1;
+    }
+    .test-autor { display: flex; align-items: center; gap: 12px; }
+    .test-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: var(--azul); display: flex; align-items: center;
+      justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+    }
+    .test-nombre { font-weight: 600; color: var(--azul); font-size: .9rem; }
+    .test-estrellas { color: var(--oro); font-size: .85rem; }
+
+    /* ══════════════════════════════════════════
+       CTA FINAL
+    ══════════════════════════════════════════ */
+    .cta-final {
+      background: linear-gradient(135deg, var(--azul) 0%, var(--azul-mid) 100%);
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-final::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(201,168,76,.10) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
+    .cta-final > * { position: relative; z-index: 1; }
+    .cta-final .section-title { color: var(--blanco); }
+    .cta-final .section-sub { color: rgba(255,255,255,.7); margin: 0 auto 40px; }
+    .cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    /* ══════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════ */
+    footer {
+      background: #080d1a;
+      padding: 48px 5vw 32px;
+      color: rgba(255,255,255,.5);
+    }
+    .footer-top {
+      display: grid; grid-template-columns: 2fr 1fr 1fr;
+      gap: 40px; margin-bottom: 40px;
+    }
+    .footer-brand .nav-logo { margin-bottom: 14px; }
+    .footer-brand p { font-size: .88rem; line-height: 1.8; max-width: 300px; }
+    .footer-col h4 {
+      font-size: .82rem; font-weight: 600; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--oro); margin-bottom: 16px;
+    }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .footer-col ul li a { font-size: .88rem; transition: color var(--trans); }
+    .footer-col ul li a:hover { color: white; }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px;
+      font-size: .82rem;
+    }
+    .footer-bottom span { color: var(--oro); }
+
+    /* ══════════════════════════════════════════
+       ANIMACIONES
+    ══════════════════════════════════════════ */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-16px); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* Reveal on scroll */
+    .reveal {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      .sobre { grid-template-columns: 1fr; }
+      .sobre-visual { min-height: 320px; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .footer-brand { grid-column: 1 / -1; }
+    }
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .nav-burger { display: flex; }
+      nav.open .nav-links {
+        display: flex; flex-direction: column; position: fixed;
+        top: 68px; left: 0; right: 0; background: var(--azul);
+        padding: 24px 5vw; gap: 20px; border-top: 1px solid rgba(255,255,255,.1);
+      }
+      .hero-stats { gap: 20px; }
+      .stat-num { font-size: 1.7rem; }
+      .footer-top { grid-template-columns: 1fr; }
+      .cta-btns { flex-direction: column; align-items: center; }
+      .cta-btns a { width: 100%; max-width: 320px; text-align: center; }
+    }
+  </style>
 </head>
-<body onload="inicializar()">
+<body>
 
-<!-- TOAST -->
-<div id="toast"></div>
-
-<!-- MODAL ESCÁNER -->
-<div id="modal-scanner">
-    <div id="scanner-region"></div>
-    <div id="scanner-info">📷 Apunta al código de barras o QR</div>
-    <button id="btn-cerrar-scanner" onclick="cerrarScanner()">✕ CANCELAR</button>
-</div>
-
-<!-- MODAL INVENTARIO -->
-<div id="modal-inventario">
-    <div class="modal-content">
-        <span class="cerrar-modal" onclick="cerrarInventario()">×</span>
-        <h2 style="color:var(--azul);margin-top:0;margin-bottom:4px;">⚙️ PRODUCTOS</h2>
-        <input type="search" id="inv-buscar" placeholder="🔍 Buscar nombre o código…" oninput="filtrarInventario(this.value)">
-        <div class="inv-contador" id="inv-contador"></div>
-        <div id="lista-inventario"></div>
-        <br>
-        <button class="btn btn-azul" onclick="cerrarInventario()">✅ VOLVER A VENTAS</button>
+  <!-- NAV -->
+  <nav id="nav">
+    <div class="nav-logo">🏰 Casa <span>Tudela</span></div>
+    <ul class="nav-links">
+      <li><a href="#caracteristicas">Servicios</a></li>
+      <li><a href="#productos">Productos</a></li>
+      <li><a href="#sobre">Nosotros</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+    <div class="nav-burger" onclick="toggleMenu()" aria-label="Menú">
+      <span></span><span></span><span></span>
     </div>
-</div>
+  </nav>
 
-<!-- TICKET IMPRIMIBLE -->
-<div id="ticket-imprimible">
-    <center><strong>CASA TUDELA</strong><br>NIF: B47489612<hr>
-    <div id="t-fecha"></div><hr></center>
-    <table style="width:100%;border:none;"><tbody id="t-lista"></tbody></table>
-    <hr><div style="text-align:right;font-weight:bold;">TOTAL: <span id="t-total">0,00€</span></div>
-    <br><center><div id="t-qr-print"></div><br>¡Gracias!</center>
-</div>
-
-<header>
-    <div>
-        <h1>🏰 CASA TUDELA</h1>
-        <small style="color:#94a3b8">Roberto García Sanz · v4.26 📱</small>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-tag">Salamanca, Castilla y León · Desde 2026</div>
+      <h1>Tu tienda<br>de <em>confianza</em><br>en Tudela</h1>
+      <p>Productos del hogar, alimentación y limpieza. Atención cercana, precios justos y la comodidad de tenerlo todo en un mismo lugar.</p>
+      <div class="hero-btns">
+        <a href="#productos" class="btn-oro">Ver productos</a>
+        <a href="#sobre" class="btn-outline">Conócenos</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">+200</div>
+          <div class="stat-label">Productos disponibles</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Atención personal</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">Hoy</div>
+          <div class="stat-label">Abiertos para ti</div>
+        </div>
+      </div>
     </div>
-    <div id="reloj"></div>
-</header>
+    <div class="scroll-hint">Explorar</div>
+  </section>
 
-
-<a href="index.html" style="display:inline-flex;align-items:center;gap:6px;
-   background:rgba(0,31,84,0.08);color:#001f54;padding:8px 16px;border-radius:50px;
-   font-size:13px;font-weight:600;margin-bottom:10px;text-decoration:none;
-   border:1px solid rgba(0,31,84,0.15);">← Volver a inicio</a>
-
-<!-- BOTÓN ESCANEAR -->
-<button id="btn-scan" onclick="abrirScanner()">📷 ESCANEAR CÓDIGO</button>
-
-<!-- FORMULARIO MANUAL -->
-<div class="entrada">
-    <div class="fila2">
-        <div><label>Código</label>
-            <input type="text" id="p-cod" inputmode="numeric" placeholder="Escanea o escribe">
-        </div>
-        <div><label>IVA</label>
-            <select id="p-iva">
-                <option value="10">10%</option>
-                <option value="4">4%</option>
-                <option value="21">21%</option>
-            </select>
-        </div>
+  <!-- CARACTERÍSTICAS -->
+  <section class="features" id="caracteristicas">
+    <div class="features-header reveal">
+      <div class="section-tag">¿Por qué elegirnos?</div>
+      <h2 class="section-title">Todo lo que necesitas,<br><em>cerca de casa</em></h2>
+      <p class="section-sub">Una tienda pensada para hacer tu día a día más fácil, con la calidez del comercio de barrio.</p>
     </div>
-    <div class="fila3">
-        <div><label>Nombre del producto</label>
-            <input type="text" id="p-nom" placeholder="Nombre">
-        </div>
-        <div><label>Precio €</label>
-            <input type="number" id="p-pre" step="0.01" min="0" placeholder="0,00"
-                   onkeypress="if(event.key==='Enter') añadirManual()">
-        </div>
-        <div style="display:flex;align-items:flex-end;">
-            <button id="btn-añadir" onclick="añadirManual()">➕ AÑADIR</button>
-        </div>
+    <div class="features-grid">
+      <div class="feat-card reveal">
+        <div class="feat-icon">🛒</div>
+        <div class="feat-title">Gran variedad</div>
+        <p class="feat-desc">Desde productos de limpieza y alimentación básica hasta artículos del hogar. Más de 200 referencias seleccionadas.</p>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">💰</div>
+        <div class="feat-title">Precios justos</div>
+        <p class="feat-desc">Precios competitivos y transparentes, con IVA incluido. Sin sorpresas en caja. Lo que ves es lo que pagas.</p>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">🤝</div>
+        <div class="feat-title">Trato cercano</div>
+        <p class="feat-desc">Atención personalizada. Te conocemos por tu nombre y sabemos lo que necesitas. El comercio de toda la vida.</p>
+      </div>
+      <div class="feat-card reveal">
+        <div class="feat-icon">⚡</div>
+        <div class="feat-title">Siempre disponible</div>
+        <p class="feat-desc">Abrimos de lunes a sábado para que nunca te falte lo que necesitas. Puntualidad y compromiso con nuestros clientes.</p>
+      </div>
     </div>
-</div>
+  </section>
 
-<!-- TOTAL -->
-<div class="total-box">
-    <span class="items" id="v-items">0 artículos</span>
-    <span class="monto" id="v-total">0,00€</span>
-</div>
+  <!-- PRODUCTOS -->
+  <section class="productos" id="productos">
+    <div class="reveal">
+      <div class="section-tag">Lo más vendido</div>
+      <h2 class="section-title">Productos <em>destacados</em></h2>
+      <p class="section-sub">Una selección de nuestros artículos más populares, siempre en stock y al mejor precio.</p>
+    </div>
 
-<!-- CARRITO -->
-<div class="panel">
-    <h3>🛒 Carrito</h3>
-    <table>
-        <thead><tr>
-            <th>Cant.</th><th>Producto</th>
-            <th style="text-align:right">Total</th><th></th>
-        </tr></thead>
-        <tbody id="cuerpo-tabla"></tbody>
-    </table>
-</div>
+    <div class="productos-grid">
+      <div class="prod-card reveal">
+        <div class="prod-img">🧴</div>
+        <div class="prod-body">
+          <div class="prod-cat">Limpieza</div>
+          <div class="prod-name">Lejía Multiusos 2L</div>
+          <div class="prod-precio">3,60€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">🍶</div>
+        <div class="prod-body">
+          <div class="prod-cat">Limpieza</div>
+          <div class="prod-name">Fairy 820ml</div>
+          <div class="prod-precio">3,95€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">💧</div>
+        <div class="prod-body">
+          <div class="prod-cat">Bebidas</div>
+          <div class="prod-name">Agua San Joaquín 1,5L</div>
+          <div class="prod-precio">0,75€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">🥛</div>
+        <div class="prod-body">
+          <div class="prod-cat">Alimentación</div>
+          <div class="prod-name">Leche Auchan 1L</div>
+          <div class="prod-precio">1,56€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">🌰</div>
+        <div class="prod-body">
+          <div class="prod-cat">Alimentación</div>
+          <div class="prod-name">Nueces Cáscara Auchan</div>
+          <div class="prod-precio">3,45€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">🧻</div>
+        <div class="prod-body">
+          <div class="prod-cat">Hogar</div>
+          <div class="prod-name">Papel Cocina Auchan 90m</div>
+          <div class="prod-precio">2,90€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">🥚</div>
+        <div class="prod-body">
+          <div class="prod-cat">Alimentación</div>
+          <div class="prod-name">12 Huevos Gallina C</div>
+          <div class="prod-precio">3,69€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">🍋</div>
+        <div class="prod-body">
+          <div class="prod-cat">Alimentación</div>
+          <div class="prod-name">Oikos Lima Limón x4</div>
+          <div class="prod-precio">2,49€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">🫒</div>
+        <div class="prod-body">
+          <div class="prod-cat">Alimentación</div>
+          <div class="prod-name">Aceite Oliva Auchan 1L</div>
+          <div class="prod-precio">4,35€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">🐟</div>
+        <div class="prod-body">
+          <div class="prod-cat">Alimentación</div>
+          <div class="prod-name">Bonito Norte MSC</div>
+          <div class="prod-precio">7,52€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">🧈</div>
+        <div class="prod-body">
+          <div class="prod-cat">Alimentación</div>
+          <div class="prod-name">Mantequilla c/sal 250g</div>
+          <div class="prod-precio">2,24€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">🍅</div>
+        <div class="prod-body">
+          <div class="prod-cat">Alimentación</div>
+          <div class="prod-name">Tomate Frito 550g</div>
+          <div class="prod-precio">0,88€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">🍊</div>
+        <div class="prod-body">
+          <div class="prod-cat">Fruta</div>
+          <div class="prod-name">Naranja Lane-Tarde 4kg</div>
+          <div class="prod-precio">4,99€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">🛍️</div>
+        <div class="prod-body">
+          <div class="prod-cat">Hogar</div>
+          <div class="prod-name">Bolsa 50×60cm</div>
+          <div class="prod-precio">0,12€</div>
+        </div>
+      </div>
+      <div class="prod-card reveal">
+        <div class="prod-img">🥖</div>
+        <div class="prod-body">
+          <div class="prod-cat">Panadería</div>
+          <div class="prod-name">Pan París</div>
+          <div class="prod-precio">1,75€</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<!-- ACCIONES -->
-<button class="btn btn-verde" onclick="cobrar()">✅ REGISTRAR COMPRA</button>
-<button class="btn btn-azul"  onclick="handlePrint()">🖨️ IMPRIMIR TICKET</button>
-<button class="btn btn-gris"  onclick="verCaja()">📊 CAJA HOY</button>
-<button class="btn btn-oscuro" onclick="abrirInventario()">⚙️ GESTIÓN INVENTARIO</button>
+  <!-- SOBRE NOSOTROS -->
+  <section class="sobre" id="sobre">
+    <div class="sobre-texto reveal">
+      <div class="section-tag">Nuestra historia</div>
+      <h2 class="section-title">Un negocio<br><em>familiar</em> con valores</h2>
+      <p class="section-sub">Casa Tudela nació en Salamanca de la convicción de que el comercio de proximidad sigue siendo necesario. Aquí cada cliente es conocido y bienvenido.</p>
+      <ul class="sobre-lista">
+        <li>Productos de primera necesidad siempre disponibles</li>
+        <li>Inventario actualizado en tiempo real</li>
+        <li>Compromiso con el comercio local de Tudela</li>
+      </ul>
+      <a href="#contacto" class="btn-oro" style="display:inline-block; padding:14px 32px; border-radius:50px; font-weight:600;">Visítanos</a>
+    </div>
+    <div class="sobre-visual">
+      <div class="castillo-grande">🏰</div>
+      <div class="sobre-badge">Roberto García Sanz · Fundador</div>
+    </div>
+  </section>
 
-<br><br>
+  <!-- TESTIMONIOS -->
+  <section class="testimonios">
+    <div class="reveal" style="text-align:center">
+      <div class="section-tag">Lo que dicen</div>
+      <h2 class="section-title">Clientes que <em>confían</em> en nosotros</h2>
+      <p class="section-sub" style="margin: 0 auto 56px;">La opinión de nuestros clientes es lo más importante.</p>
+    </div>
+    <div class="test-grid">
+      <div class="test-card reveal">
+        <p class="test-texto">Llevo meses comprando aquí. Los precios son muy buenos y Roberto siempre tiene lo que necesito. Un trato excelente y productos de primera calidad.</p>
+        <div class="test-autor">
+          <div class="test-avatar">👩</div>
+          <div>
+            <div class="test-nombre">María L.</div>
+            <div class="test-estrellas">★★★★★</div>
+          </div>
+        </div>
+      </div>
+      <div class="test-card reveal">
+        <p class="test-texto">Lo mejor es que siempre tiene los productos básicos en stock. Nunca me ha fallado y el trato es fantástico. Una tienda de las de antes, con lo bueno de hoy.</p>
+        <div class="test-autor">
+          <div class="test-avatar">👨</div>
+          <div>
+            <div class="test-nombre">Carlos M.</div>
+            <div class="test-estrellas">★★★★★</div>
+          </div>
+        </div>
+      </div>
+      <div class="test-card reveal">
+        <p class="test-texto">Me encanta poder comprar cerca de casa y que los precios sean transparentes. El recibo siempre llega completo con todo detallado. Total confianza.</p>
+        <div class="test-autor">
+          <div class="test-avatar">👩</div>
+          <div>
+            <div class="test-nombre">Ana R.</div>
+            <div class="test-estrellas">★★★★★</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<script>
-// ═══════════════════════════════════════════════════════
-//  INVENTARIO BASE
-// ═══════════════════════════════════════════════════════
-const BASE = [
-    {cod:"8410436392693", nom:"Lejia Multiusos 2Litros",        pre:3.60, iva:10},
-    {cod:"4084500617421", nom:"Fairy 820",                       pre:3.95, iva:10},
-    {cod:"8413402980306", nom:"Agua San Joaquin 1.5L",           pre:0.75, iva:10},
-    {cod:"8410379942788", nom:"Auchan Leche 1L",                 pre:1.56, iva:10},
-    {cod:"8435177059216", nom:"Nueces Cáscara de Auchan",        pre:3.45, iva:10},
-    {cod:"8433111000188", nom:"Papel de Cocina Auchan 90m",      pre:2.90, iva:10},
-    {cod:"8437015354477", nom:"12 Huevos Gallina C",             pre:3.69, iva: 4},
-    {cod:"8410500025809", nom:"Casa Oikos Sabor Lima Limon X4",  pre:2.49, iva: 4},
-    {cod:"8410352208337", nom:"Auchan Aceite Oliva 1L",          pre:4.35, iva: 4},
-    {cod:"8429583008760", nom:"BONITO NORTE MSC",                pre:7.52, iva:10},
-    {cod:"8411293020170", nom:"MANTEQUILLA C/SAL 250G",          pre:2.24, iva:10},
-    {cod:"8410416014614", nom:"Tomate frito 550g",               pre:0.88, iva:10},
-    {cod:"8435177019210", nom:"Naranja Lane-Tarde 4K Auchan",    pre:4.99, iva: 4},
-    {cod:"8411921509855", nom:"BOLSA 50X60CM",                   pre:0.12, iva:21},
-    {cod:"2073228001751", nom:"PAN PARIS",                       pre:1.75, iva: 4}
-];
+  <!-- CTA FINAL -->
+  <section class="cta-final" id="contacto">
+    <div class="section-tag" style="color:var(--oro-claro)">¿Hablamos?</div>
+    <h2 class="section-title">Ven a <em>visitarnos</em><br>cuando quieras</h2>
+    <p class="section-sub">Estamos en Salamanca, Castilla y León. Puedes venir directamente o contactar con nosotros. Estaremos encantados de atenderte.</p>
+    <div class="cta-btns">
+      <a href="mailto:roberto@casatudela.es" class="btn-oro">✉️ Escribir email</a>
+      <a href="#productos" class="btn-outline" style="color:white; border:1.5px solid rgba(255,255,255,.4); padding:14px 32px; border-radius:50px; font-weight:500;">Ver productos</a>
+    </div>
+    <div style="margin-top:48px; display:flex; justify-content:center; gap:48px; flex-wrap:wrap;">
+      <div style="text-align:center; color:rgba(255,255,255,.7)">
+        <div style="font-size:1.8rem; margin-bottom:6px;">📍</div>
+        <div style="font-size:.9rem; font-weight:500; color:white;">Salamanca</div>
+        <div style="font-size:.82rem;">Castilla y León</div>
+      </div>
+      <div style="text-align:center; color:rgba(255,255,255,.7)">
+        <div style="font-size:1.8rem; margin-bottom:6px;">🕘</div>
+        <div style="font-size:.9rem; font-weight:500; color:white;">Lun–Sáb</div>
+        <div style="font-size:.82rem;">9:00 – 20:00</div>
+      </div>
+      <div style="text-align:center; color:rgba(255,255,255,.7)">
+        <div style="font-size:1.8rem; margin-bottom:6px;">📧</div>
+        <div style="font-size:.9rem; font-weight:500; color:white;"><a href="mailto:roberto@casatudela.es" style="color:rgba(255,255,255,.5);">roberto@casatudela.es</a></div>
+        <div style="font-size:.82rem;">Respondemos en 24h</div>
+      </div>
+    </div>
+  </section>
 
-let inventario = [];   // inventario activo en memoria
-let carrito    = [];
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="nav-logo">🏰 Casa <span>Tudela</span></div>
+        <p>Tu tienda de productos del hogar en Salamanca. Proximidad, calidad y atención personalizada desde 2026.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Tienda</h4>
+        <ul>
+          <li><a href="#productos">Productos</a></li>
+          <li><a href="#caracteristicas">Servicios</a></li>
+          <li><a href="#sobre">Nosotros</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="mailto:roberto@casatudela.es">Aviso legal</a></li>
+          <li><a href="mailto:roberto@casatudela.es">Privacidad</a></li>
+          <li><a href="mailto:roberto@casatudela.es">Cookies</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 <span>Casa Tudela</span> · Roberto García Sanz · NIF: B47489612 · <a href="mailto:roberto@casatudela.es" style="color:rgba(255,255,255,.5);">roberto@casatudela.es</a></div>
+      <div>Hecho con ❤️ en Salamanca</div>
+    </div>
+  </footer>
 
-// ═══════════════════════════════════════════════════════
-//  PERSISTENCIA — clave única para móvil
-// ═══════════════════════════════════════════════════════
-const LS_INV  = 'ct_inventario_v2';   // productos añadidos/modificados
-const LS_VTAS = 'ct_ventas_v2';       // historial de ventas
-
-function cargarInventario() {
-    // 1. Partir del inventario base
-    const mapa = {};
-    BASE.forEach(p => { mapa[p.cod] = {...p}; });
-
-    // 2. Aplicar los cambios guardados (nuevos + modificaciones)
-    let guardados = [];
-    try { guardados = JSON.parse(localStorage.getItem(LS_INV)) || []; } catch(e) {}
-
-    guardados.forEach(p => {
-        mapa[String(p.cod)] = {...p, cod: String(p.cod)};
-    });
-
-    inventario = Object.values(mapa);
-}
-
-function guardarInventario() {
-    // Guardar SOLO los productos que difieren del BASE o son nuevos
-    const cambios = inventario.filter(p => {
-        const orig = BASE.find(b => String(b.cod) === String(p.cod));
-        return !orig                        // producto nuevo
-            || orig.pre !== p.pre           // precio cambiado
-            || orig.nom !== p.nom           // nombre cambiado
-            || orig.iva !== p.iva;          // iva cambiado
-    });
-    try {
-        localStorage.setItem(LS_INV, JSON.stringify(cambios));
-    } catch(e) {
-        toast('⚠️ Error al guardar: ' + e.message);
+  <script>
+    // Menú móvil
+    function toggleMenu() {
+      document.getElementById('nav').classList.toggle('open');
     }
-}
 
-// ═══════════════════════════════════════════════════════
-//  ARRANQUE
-// ═══════════════════════════════════════════════════════
-function inicializar() {
-    // Migrar datos del sistema anterior si existen
-    migrarDatosAntiguos();
-    cargarInventario();
-    actualizarUI();
-    toast('✅ ' + inventario.length + ' productos cargados');
-}
+    // Cerrar menú al hacer clic en un enlace
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.addEventListener('click', () => document.getElementById('nav').classList.remove('open'));
+    });
 
-function migrarDatosAntiguos() {
-    // Si hay datos del formato anterior, migrarlos al nuevo y borrar los viejos
-    const viejos = localStorage.getItem('prod_nuevos') || localStorage.getItem('inventarioPersonalizado');
-    if (!viejos) return;
-    if (localStorage.getItem(LS_INV)) return; // ya migrado
-
-    try {
-        const arr = JSON.parse(viejos) || [];
-        if (arr.length > 0) {
-            localStorage.setItem(LS_INV, JSON.stringify(arr));
-            toast('📦 Datos anteriores migrados (' + arr.length + ' productos)');
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
         }
-    } catch(e) {}
-}
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-// ═══════════════════════════════════════════════════════
-//  INVENTARIO — GESTIÓN
-// ═══════════════════════════════════════════════════════
-function abrirInventario() {
-    document.getElementById('inv-buscar').value = '';
-    renderLista(inventario);
-    document.getElementById('modal-inventario').classList.add('activo');
-}
-function cerrarInventario() {
-    document.getElementById('modal-inventario').classList.remove('activo');
-    document.getElementById('p-cod').focus();
-}
-function filtrarInventario(q) {
-    q = q.toLowerCase().trim();
-    const filtrado = q
-        ? inventario.filter(p => p.nom.toLowerCase().includes(q) || String(p.cod).includes(q))
-        : inventario;
-    renderLista(filtrado);
-}
-function renderLista(lista) {
-    const cont = document.getElementById('lista-inventario');
-    document.getElementById('inv-contador').innerText = lista.length + ' productos';
-    cont.innerHTML = '';
-    lista.forEach(p => {
-        const idx = inventario.indexOf(p);
-        const f = document.createElement('div');
-        f.className = 'inv-fila';
-        f.innerHTML = `
-            <div>
-                <div class="inv-nom" title="${p.nom}">${p.nom}</div>
-                <div class="inv-cod">${p.cod || '—'}</div>
-            </div>
-            <input class="inv-pre" type="number" value="${p.pre.toFixed(2)}"
-                   step="0.01" min="0" onchange="modificarPrecio(${idx},this.value)">
-            <span class="iva-badge">${p.iva}%</span>
-            <button class="btn-del" onclick="eliminarProducto(${idx})">🗑</button>`;
-        cont.appendChild(f);
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Navbar scroll shadow
+    window.addEventListener('scroll', () => {
+      const nav = document.getElementById('nav');
+      if (window.scrollY > 40) {
+        nav.style.boxShadow = '0 4px 30px rgba(0,0,0,0.3)';
+      } else {
+        nav.style.boxShadow = 'none';
+      }
     });
-}
-function modificarPrecio(idx, v) {
-    inventario[idx].pre = parseFloat(v);
-    guardarInventario();
-    toast('💰 Precio actualizado');
-}
-function eliminarProducto(idx) {
-    if (!confirm('¿Borrar "' + inventario[idx].nom + '"?')) return;
-    inventario.splice(idx, 1);
-    guardarInventario();
-    const q = document.getElementById('inv-buscar').value;
-    filtrarInventario(q);
-    toast('🗑 Producto borrado');
-}
-
-// ═══════════════════════════════════════════════════════
-//  VENTAS
-// ═══════════════════════════════════════════════════════
-function buscar(e) {
-    if (e) e.preventDefault();
-    const c = document.getElementById('p-cod').value.trim();
-    const p = inventario.find(x => String(x.cod) === String(c));
-    if (p) {
-        añadirAlCarrito(p.nom, p.pre, p.iva);
-        document.getElementById('p-cod').value = '';
-    } else {
-        toast('⚠️ Código no encontrado');
-        document.getElementById('p-nom').focus();
-    }
-}
-
-function añadirManual() {
-    const cod = document.getElementById('p-cod').value.trim();
-    const nom = document.getElementById('p-nom').value.trim();
-    const pre = parseFloat(document.getElementById('p-pre').value);
-    const iva = parseInt(document.getElementById('p-iva').value);
-
-    if (!nom) { toast('⚠️ Escribe el nombre'); document.getElementById('p-nom').focus(); return; }
-    if (isNaN(pre) || pre <= 0) { toast('⚠️ Precio no válido'); document.getElementById('p-pre').focus(); return; }
-
-    // ¿El código ya existe en inventario?
-    const existe = cod !== '' && inventario.findIndex(x => String(x.cod) === String(cod)) !== -1;
-
-    if (cod !== '' && !existe) {
-        // Producto NUEVO → guardarlo permanentemente
-        const nuevo = { cod, nom, pre, iva };
-        inventario.push(nuevo);
-        guardarInventario();
-        toast('✅ "' + nom + '" guardado en inventario');
-    }
-
-    añadirAlCarrito(nom, pre, iva);
-    ['p-cod','p-nom','p-pre'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('p-cod').focus();
-}
-
-function añadirAlCarrito(nom, pre, iva) {
-    const it = carrito.find(x => x.nom === nom);
-    it ? it.cant++ : carrito.push({ nom, pre, iva, cant:1 });
-    actualizarUI();
-}
-
-function actualizarUI() {
-    const tbody = document.getElementById('cuerpo-tabla');
-    tbody.innerHTML = '';
-    let total = 0, nitems = 0;
-    carrito.forEach((it, i) => {
-        const sub = it.pre * it.cant;
-        total += sub; nitems += it.cant;
-        tbody.innerHTML += `<tr>
-            <td>${it.cant}x</td>
-            <td>${it.nom}</td>
-            <td align="right">${sub.toFixed(2)}€</td>
-            <td><button onclick="carrito.splice(${i},1);actualizarUI()"
-                style="border:none;background:none;color:red;font-size:16px;cursor:pointer;">✕</button></td>
-        </tr>`;
-    });
-    document.getElementById('v-total').innerText = total.toFixed(2).replace('.', ',') + '€';
-    document.getElementById('v-items').innerText = nitems + ' artículos';
-}
-
-function cobrar() {
-    if (carrito.length === 0) return;
-    let ventas = [];
-    try { ventas = JSON.parse(localStorage.getItem(LS_VTAS)) || []; } catch(e) {}
-    ventas.push({
-        fecha:    new Date().toLocaleString(),
-        total:    carrito.reduce((a,b) => a + b.pre * b.cant, 0),
-        detalles: carrito.map(p => p.cant + 'x ' + p.nom).join(' | ')
-    });
-    localStorage.setItem(LS_VTAS, JSON.stringify(ventas));
-    carrito = [];
-    actualizarUI();
-    toast('✅ Venta registrada');
-    document.getElementById('p-cod').focus();
-}
-
-function verCaja() {
-    let ventas = [];
-    try { ventas = JSON.parse(localStorage.getItem(LS_VTAS)) || []; } catch(e) {}
-    const hoy = new Date().toLocaleDateString();
-    const hoyV = ventas.filter(v => v.fecha.includes(hoy));
-    const total = hoyV.reduce((a, b) => a + b.total, 0);
-    toast('💰 HOY: ' + total.toFixed(2).replace('.', ',') + '€  (' + hoyV.length + ' ventas)');
-}
-
-function descargarExcel() {
-    let ventas = [];
-    try { ventas = JSON.parse(localStorage.getItem(LS_VTAS)) || []; } catch(e) {}
-    let csv = 'Fecha;Productos;Total\n';
-    ventas.forEach(v => {
-        csv += v.fecha + ';' + (v.detalles || '') + ';' + v.total.toFixed(2).replace('.', ',') + '€\n';
-    });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8;'}));
-    a.download = 'Ventas_CasaTudela.csv';
-    a.click();
-}
-
-function handlePrint() {
-    if (carrito.length === 0) return;
-    const f = new Date().toLocaleString();
-    document.getElementById('t-fecha').innerText = f;
-    const tl = document.getElementById('t-lista');
-    tl.innerHTML = '';
-    let txt = 'CASA TUDELA\n' + f + '\n---\n';
-    carrito.forEach(it => {
-        const s = (it.pre * it.cant).toFixed(2);
-        tl.innerHTML += `<tr><td>${it.cant}x</td><td>${it.nom.substring(0,16)}</td><td align="right">${s}€</td></tr>`;
-        txt += `${it.cant}x ${it.nom} - ${s}€\n`;
-    });
-    const tot = document.getElementById('v-total').innerText;
-    document.getElementById('t-total').innerText = tot;
-    txt += '---\nTOTAL: ' + tot;
-    const qr = qrcode(0, 'M'); qr.addData(txt); qr.make();
-    document.getElementById('t-qr-print').innerHTML = qr.createImgTag(5);
-    setTimeout(() => window.print(), 300);
-}
-
-// ═══════════════════════════════════════════════════════
-//  ESCÁNER DE CÁMARA
-// ═══════════════════════════════════════════════════════
-let qrScanner = null;
-let scanActivo = false;
-let scanBloq   = false;
-
-function abrirScanner() {
-    document.getElementById('modal-scanner').classList.add('activo');
-    document.getElementById('scanner-region').innerHTML = '';
-    scanBloq = false;
-
-    qrScanner = new Html5Qrcode('scanner-region');
-
-    Html5Qrcode.getCameras().then(cams => {
-        if (!cams || !cams.length) {
-            document.getElementById('scanner-info').innerText = '❌ No se encontró cámara';
-            return;
-        }
-        const cam = cams.find(c => /back|rear|environment/i.test(c.label)) || cams[cams.length - 1];
-
-        qrScanner.start(
-            { deviceId: { exact: cam.id } },
-            { fps:10, qrbox:{ width:260, height:155 }, aspectRatio:1.6 },
-            onCodigoEscaneado,
-            () => {}
-        ).then(() => {
-            scanActivo = true;
-            document.getElementById('scanner-info').innerText = '📷 Apunta al código de barras o QR';
-        }).catch(err => {
-            document.getElementById('scanner-info').innerText = '❌ ' + err;
-        });
-
-    }).catch(() => {
-        document.getElementById('scanner-info').innerText = '❌ Sin permiso de cámara';
-    });
-}
-
-function cerrarScanner() {
-    scanActivo = false;
-    scanBloq   = false;
-    if (qrScanner) {
-        qrScanner.stop().then(() => { qrScanner.clear(); qrScanner = null; }).catch(() => { qrScanner = null; });
-    }
-    document.getElementById('modal-scanner').classList.remove('activo');
-    setTimeout(() => { document.getElementById('scanner-region').innerHTML = ''; }, 400);
-}
-
-function onCodigoEscaneado(codigo) {
-    if (!scanActivo || scanBloq) return;
-    scanBloq = true;
-    try { qrScanner.pause(true); } catch(e) {}
-
-    if (navigator.vibrate) navigator.vibrate(120);
-    codigo = codigo.trim();
-
-    const info = document.getElementById('scanner-info');
-    const p = inventario.find(x => String(x.cod) === String(codigo));
-
-    if (p) {
-        añadirAlCarrito(p.nom, p.pre, p.iva);
-        info.innerHTML = '<span style="color:#10b981;font-weight:bold">✅ ' + p.nom + '</span>';
-        setTimeout(() => {
-            if (scanActivo) {
-                try { qrScanner.resume(); } catch(e) {}
-                scanBloq = false;
-                info.innerText = '📷 Apunta al siguiente código';
-            }
-        }, 2000);
-    } else {
-        info.innerHTML = '<span style="color:#fbbf24;font-weight:bold">⚠️ Código nuevo — añade nombre y precio</span>';
-        document.getElementById('p-cod').value = codigo;
-        setTimeout(() => {
-            cerrarScanner();
-            setTimeout(() => {
-                document.getElementById('p-nom').value = '';
-                document.getElementById('p-pre').value = '';
-                document.getElementById('p-nom').focus();
-                toast('⚠️ Código ' + codigo + ' — rellena nombre y precio, luego ➕ AÑADIR');
-            }, 350);
-        }, 900);
-    }
-}
-
-// ═══════════════════════════════════════════════════════
-//  TOAST
-// ═══════════════════════════════════════════════════════
-let _tt = null;
-function toast(msg) {
-    if (_tt) clearTimeout(_tt);
-    const el = document.getElementById('toast');
-    el.innerText = msg;
-    el.style.display = 'block';
-    _tt = setTimeout(() => { el.style.display = 'none'; }, 2200);
-}
-
-// Reloj
-setInterval(() => document.getElementById('reloj').innerText = new Date().toLocaleTimeString(), 1000);
-</script>
+  </script>
 </body>
 </html>
